@@ -6,6 +6,38 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 -->
 <!-- lang: en-GB -->
+
+> ## 🍎 PokeDinner for Mac — download and play
+>
+> **[⬇️ Download PokeDinner for Mac (Apple Silicon)](https://github.com/Apollo422/PokeDinner/releases/latest/download/PokeDinner-macOS-AppleSilicon.zip)**: ready to run, nothing else to install.
+>
+> **Needs:** Apple Silicon Mac (M1 or newer), macOS 15 Sequoia or later.
+>
+> **Install**
+> 1. Download the zip above and double-click it to unzip.
+> 2. Drag **PokeDinner.app** into **Applications**.
+> 3. Open it. When macOS says it "could not verify" the app, click **Done**.
+> 4. Go to **System Settings → Privacy & Security**, scroll down, click **Open Anyway**, and enter your password.
+> 5. It opens normally from then on.
+>
+> **First-time setup**
+> - **Keys:** Tools → Install Decryption Keys → choose your `prod.keys`
+> - **Firmware:** Tools → Install Firmware → choose your firmware dump
+> - **Games:** double-click the empty game list → add the folder with your `.nsp` / `.xci` files
+> - **Settings:** press **⌘ ,**
+>
+> Keys, firmware, and games must be dumped from **your own** Nintendo Switch. They are not included.
+>
+> **Controllers:** Settings → Controls → Player 1 → pick your controller under *Input Device*, then click each button and press it.
+> - *GameCube controller via Mayflash adapter:* set the adapter switch to **PC** mode and choose **"Nintendo GameCube Controller"**. If up/down is reversed, right-click the stick → **Invert axis**. If the stick feels weak, raise **Range** to about 150%.
+>
+> **Problems?**
+> - *"App is damaged" / won't open:* repeat step 4. Or, in Terminal: `xattr -dr com.apple.quarantine /Applications/PokeDinner.app`
+> - *Crashes right after launch:* open it again. A rare startup crash in the game list exists in the current code.
+> - *"Missing keys":* reinstall keys (Tools → Install Decryption Keys). Keys must match your firmware version.
+>
+> <sub>Mac build by Apollo422. Code by Franseven ([original repo](https://git.eden-emu.dev/Franseven/PokeDinner-a-Eglantine-Fork)), based on Eglantine / Eden / yuzu, GPLv3. Want to build it yourself? See [BUILD-AND-RUN-MAC.md](BUILD-AND-RUN-MAC.md).</sub>
+
 <h4 align="center"><b>PokeDinner is a fork that unites commits and creates fixes, it is assisted by AI and requires expensive subscriptions, please consider donating if you can. 
   Authors of main are below, i'm not affiliated</b>
 </h4>
