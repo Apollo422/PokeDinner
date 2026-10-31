@@ -510,7 +510,7 @@ struct Values {
                                          linkage, 0, "bg_blue", Category::Renderer, Specialization::Default, true, true};
 
     SwitchableSetting<GpuAccuracy, true> gpu_accuracy{linkage,
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(__APPLE__)
                                                       GpuAccuracy::Low,
 #else
                                                       GpuAccuracy::High,
@@ -662,7 +662,15 @@ struct Values {
     SwitchableSetting<bool> emulate_bgr565{linkage, false, "emulate_bgr565",
                                             Category::RendererHacks};
 
-    SwitchableSetting<bool> use_asynchronous_shaders{linkage, false, "use_asynchronous_shaders",
+    // macOS: shaders go through MoltenVK and compile slowly, so build them in the
+    // background by default instead of stalling the game.
+    SwitchableSetting<bool> use_asynchronous_shaders{linkage,
+#ifdef __APPLE__
+                                                     true,
+#else
+                                                     false,
+#endif
+                                                     "use_asynchronous_shaders",
                                                      Category::RendererHacks};
 
     SwitchableSetting<GpuUnswizzleSize> gpu_unswizzle_texture_size{linkage,
