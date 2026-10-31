@@ -35,6 +35,18 @@
 > - *"App is damaged" / won't open:* repeat step 4. Or, in Terminal: `xattr -dr com.apple.quarantine /Applications/PokeDinner.app`
 > - *Crashes right after launch:* open it again. A rare startup crash in the game list exists in the current code.
 > - *"Missing keys":* reinstall keys (Tools → Install Decryption Keys). Keys must match your firmware version.
+> - *"Deconstructed ROM directory" warning:* click OK; the game still runs. Single `.nsp`/`.xci` dumps add icons, names, and update support.
+>
+> **Slow / low FPS?** If the status bar says *"Building: N shader(s)"*, the game is preparing graphics. It stutters the first time through each area, then gets faster and stays fast. Press **⌘ ,** and check:
+> - **Graphics → Resolution:** 1x (2x renders 4× the pixels)
+> - **Graphics → ASTC Decoding Method:** GPU
+> - **GraphicsAdvanced → GPU Mode:** Fast *(default on Mac)*
+> - **GraphicsAdvanced → Use persistent pipeline cache** and **Use Vulkan pipeline cache:** ✅
+> - **GraphicsExtra → Hacks → Enable asynchronous shader compilation:** ✅ *(default on Mac)*
+> - **GraphicsAdvanced → GPU Fence Behavior:** Immediate *(set back to Default if graphics glitch)*
+> - **CPU → Multicore CPU Emulation:** ✅
+>
+> Macs translate Switch graphics through an extra layer (Vulkan → Metal), so demanding games may stay below full speed even on M4-class chips.
 >
 > <sub>Mac build by Apollo422. Code by Franseven ([original repo](https://git.eden-emu.dev/Franseven/PokeDinner-a-Eglantine-Fork)), based on Eglantine / Eden / yuzu, GPLv3. Want to build it yourself? See [BUILD-AND-RUN-MAC.md](BUILD-AND-RUN-MAC.md).</sub>
 
