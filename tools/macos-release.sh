@@ -2,12 +2,16 @@
 # Build, package, and publish a NEW GitHub release for the Mac app.
 # Every run creates a new tag so older versions stay downloadable.
 #
-# Usage: tools/macos-release.sh "What changed in this version"
+# Usage: tools/macos-release.sh "What changed in this version" [patch|minor|major]
 #
-# Tags: mac-YYYY.MM.DD, then mac-YYYY.MM.DD.2, .3, ... for more releases the same day.
+# Versions follow semver tags: v1.0.0 -> v1.0.1 (patch, default) -> v1.1.0 (minor) -> v2.0.0 (major).
+#   patch: bug fixes and small tweaks
+#   minor: new features or notable improvements
+#   major: big changes that may break settings or workflows
 set -euo pipefail
 
-CHANGES="${1:?usage: tools/macos-release.sh \"what changed\"}"
+CHANGES="${1:?usage: tools/macos-release.sh \"what changed\" [patch|minor|major]}"
+BUMP="${2:-patch}"
 REPO="${RELEASE_REPO:-Apollo422/PokeDinner}"
 REMOTE="${RELEASE_REMOTE:-github}"
 BUILD_DIR="build/release"
@@ -21,20 +25,28 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
     exit 1
 fi
 
-# Pick the next free tag for today.
-BASE="mac-$(date +%Y.%m.%d)"
-TAG="$BASE"
-N=1
-while gh release view "$TAG" -R "$REPO" >/dev/null 2>&1; do
-    N=$((N + 1))
-    TAG="$BASE.$N"
-done
+# Next version from the newest vX.Y.Z release.
+LATEST="$(gh release list -R "$REPO" --limit 100 --json tagName -q '.[].tagName' \
+          | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)"
+IFS=. read -r MAJ MIN PAT <<< "${LATEST:-0.0.0}"
+case "$BUMP" in
+    patch) PAT=$((PAT + 1)) ;;
+    minor) MIN=$((MIN + 1)); PAT=0 ;;
+    major) MAJ=$((MAJ + 1)); MIN=0; PAT=0 ;;
+    *) echo "error: bump must be patch, minor, or major" >&2; exit 1 ;;
+esac
+VERSION="$MAJ.$MIN.$PAT"
+TAG="v$VERSION"
+if gh release view "$TAG" -R "$REPO" >/dev/null 2>&1; then
+    echo "error: $TAG already exists" >&2; exit 1
+fi
+echo "==> Releasing $TAG (previous: ${LATEST:-none})"
 
 echo "==> Building"
 cmake --build "$BUILD_DIR"
 
 echo "==> Packaging"
-tools/macos-package.sh "$BUILD_DIR" "$OUT_DIR"
+APP_VERSION="$VERSION" tools/macos-package.sh "$BUILD_DIR" "$OUT_DIR"
 SHA="$(shasum -a 256 "$ZIP" | cut -d' ' -f1)"
 
 echo "==> Pushing source"
@@ -43,7 +55,7 @@ COMMIT="$(git rev-parse --short HEAD)"
 
 NOTES="$(mktemp)"
 cat > "$NOTES" <<EOF
-## What's new
+## What's new in $TAG
 $CHANGES
 
 ---
@@ -77,7 +89,7 @@ EOF
 
 echo "==> Creating release $TAG"
 gh release create "$TAG" "$ZIP" -R "$REPO" --target "$(git rev-parse HEAD)" \
-    --title "PokeDinner for Mac (Apple Silicon) – $TAG" --notes-file "$NOTES" --latest
+    --title "PokeDinner for Mac $TAG" --notes-file "$NOTES" --latest
 rm -f "$NOTES"
 
 echo "Released: https://github.com/$REPO/releases/tag/$TAG"

@@ -68,7 +68,7 @@ fi
 echo "==> Setting bundle metadata"
 PLIST="$WORK/Contents/Info.plist"
 PB=/usr/libexec/PlistBuddy
-VERSION="$(date +%Y.%m.%d)"
+VERSION="${APP_VERSION:-$(date +%Y.%m.%d)}"
 set_key() { $PB -c "Set :$1 $2" "$PLIST" 2>/dev/null || $PB -c "Add :$1 string $2" "$PLIST"; }
 set_key CFBundleExecutable eglantine
 set_key CFBundleName "$APP_NAME"
